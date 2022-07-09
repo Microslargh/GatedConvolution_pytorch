@@ -2,13 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 #from models.gatedconv import InpaintGCNet, InpaintDirciminator
-from models.sa_gan import InpaintSANet, InpaintSADirciminator
-from models.loss import SNDisLoss, SNGenLoss, ReconLoss
-from util.logger import TensorBoardLogger
-from util.config import Config
-from data.inpaint_dataset import InpaintDataset
-from util.evaluation import AverageMeter
-from evaluation import metrics
+from models.sa_gan import InpaintSANet, InpaintSADirciminator   #导入网络模型架构
+from models.loss import SNDisLoss, SNGenLoss, ReconLoss     #导入损失
+from util.logger import TensorBoardLogger   #打印日志
+from util.config import Config   #读取配置
+from data.inpaint_dataset import InpaintDataset   #数据读入
+from util.evaluation import AverageMeter   #测试函数
+from evaluation import metrics   #测试指标
 from PIL import Image
 import pickle as pkl
 import numpy as np
@@ -27,7 +27,7 @@ tensorboardlogger = TensorBoardLogger(log_dir)
 cuda0 = torch.device('cuda:{}'.format(config.GPU_ID))
 cpu0 = torch.device('cpu')
 
-def logger_init():
+def logger_init():   #打印设置
     """
     Initialize the logger to some file.
     """
@@ -43,6 +43,7 @@ def logger_init():
 def validate(netG, netD, GANLoss, ReconLoss, DLoss, optG, optD, dataloader, epoch, device=cuda0, batch_n="whole"):
     """
     validate phase
+    DLoss
     """
     netG.to(device)
     netD.to(device)
@@ -284,8 +285,8 @@ def main():
 
     # Define the Network Structure
     logger.info("Define the Network Structure and Losses")
-    netG = InpaintSANet()
-    netD = InpaintSADirciminator()
+    netG = InpaintSANet()   #网络
+    netD = InpaintSADirciminator()   #网络
 
     if config.MODEL_RESTORE != '':
         whole_model_path = 'model_logs/{}'.format( config.MODEL_RESTORE)
@@ -297,13 +298,13 @@ def main():
 
     # Define loss
     recon_loss = ReconLoss(*(config.L1_LOSS_ALPHA))
-    gan_loss = SNGenLoss(config.GAN_LOSS_ALPHA)
-    dis_loss = SNDisLoss()
+    gan_loss = SNGenLoss(config.GAN_LOSS_ALPHA)  #两个一个gen
+    dis_loss = SNDisLoss()  #一个
     lr, decay = config.LEARNING_RATE, config.WEIGHT_DECAY
     optG = torch.optim.Adam(netG.parameters(), lr=lr, weight_decay=decay)
     optD = torch.optim.Adam(netD.parameters(), lr=4*lr, weight_decay=decay)
 
-    logger.info("Finish Define the Network Structure and Losses")
+    logger.info("Finish Define the Network Structure and Losses")   #完成定义网络结构和损失
 
     # Start Training
     logger.info("Start Training...")
